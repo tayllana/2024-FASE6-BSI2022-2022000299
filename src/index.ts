@@ -9,6 +9,10 @@ const app = express()
 app.use(express.json())
 app.use(express.static(__dirname + '/../public'))
 
+app.get('/', async (req, res) => {
+    res.sendFile("Hello World");
+  })
+
 app.get('/users', async (req, res) => {
   const db = await connect()
   const users = await db.all('SELECT * FROM users')
