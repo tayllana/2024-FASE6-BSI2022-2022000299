@@ -1,17 +1,11 @@
 import express from 'express'
-// import cors from 'cors'
 import { connect } from './database'
 
-const port = 3333
+const port = 3000
 const app = express()
 
-// app.use(cors())
 app.use(express.json())
 app.use(express.static(__dirname + '/../public'))
-
-app.get('/', async (req, res) => {
-    res.sendFile("Hello World");
-  })
 
 app.get('/users', async (req, res) => {
   const db = await connect()
