@@ -35,19 +35,17 @@
     flex: none;
   }
   
-  form[data-id] {
-    & button[data-action=create] {
-      display: none;
-    }
+  form[data-id]  button[data-action=create] {
+    display: none;
   }
   
-  form:not([data-id]) {
-    & button[data-action=update],
-    & button[data-action=delete] {
-      display: none;
-    }
+  
+  form:not([data-id]) button[data-action=update],
+  form:not([data-id]) button[data-action=delete] {
+    display: none;
   }
   
+
   form .input-container {
     margin-bottom: 1rem;
   }
