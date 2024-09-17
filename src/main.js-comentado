@@ -1,0 +1,95 @@
+const mainForm = document.querySelector('form') // Pega o formulário e guarda na variável mainForm
+
+// Função assíncrona (Faz tarefas sem travar a execução do restante do código)
+void async function () {
+  // Pede a lista de usuários e espera a resposta antes de continuar (await)
+  const response = await fetch('/users')
+  const users = await response.json() // Transforma a resposta em JSON
+
+  users.forEach(user => { // Executa as ações para cada item do array
+    const newForm = mainForm.cloneNode(true) // Faz uma cópia do formulario
+    // Adiciona os valores do array aos campos correspondentes no formulário 
+    newForm.name.value = user.name
+    newForm.email.value = user.email
+    newForm.dataset.id = user.id
+    newForm.id.readOnly = true
+    
+    mainForm.before(newForm) // Insere o novo formulário na página
+  })
+  console.log(users) // mostra o array na console
+}()
+
+document.addEventListener('submit', async (event) => { // Quando o formulario for enviado executa a função
+  event.preventDefault() // bloqueia o recarregamento da página
+
+  const action = event.submitter.dataset.action ?? null // Pega o valor do data-action pra saber qual ação executar
+  const currentForm = event.target // Pega o formulário
+  
+  if (action === 'delete') {
+    // Entra aqui se a ação for deletar
+    const id = currentForm.dataset.id
+    const method = 'DELETE'
+    const url = `/users/${id}`
+    
+    // Faz uma chamada para deletar o usuario pelo id que foi passado por parametro
+    const response = await fetch(url, { method })
+    
+    if (!response.ok) // Se deu algum erro exibe a mensagem abaixo
+      return console.error('Error:', response.statusText)
+    
+    currentForm.remove() // Remove o form pq o usuário foi apagado
+    return
+  }
+  
+  if (action === 'update') {
+    // Entra aqui se a ação for atualizar os dados do usuairo
+    const id = currentForm.dataset.id
+    const method = 'PUT'
+    const url = `/users/${id}`
+    const headers = { 'Content-Type': 'application/json' }
+    const name = currentForm.name.value
+    const email = currentForm.email.value
+    const body = JSON.stringify({ name, email })
+    
+    // Faz uma chaamda enviandos os dados do usuario que serão atualizados
+    const response = await fetch(url, { method, headers, body })
+    
+    if (!response.ok) // Se deu algum erro exibe a mensagem abaixo
+      return console.error('Error:', response.statusText)
+    
+    const responseData = await response.json() // Pega a resposta com os dados atualizados e transforma em JSON
+    // Atualiza os campos do formulário com os dados da resposta
+    currentForm.name.value = responseData.name
+    currentForm.email.value = responseData.email
+    return
+  }
+  
+  if (action === 'create') {
+    // Entra aqui se a ação for criar novo usuario
+    const method = 'POST'
+    const url = '/users'
+    const headers = { 'Content-Type': 'application/json' }
+    const name = currentForm.name.value
+    const email = currentForm.email.value
+    const body = JSON.stringify({ name, email })
+    
+    // Faz uma chamada enviando os dados do novo usuário para serem salvos
+    const response = await fetch(url, { method, headers, body })
+    
+    if (!response.ok) // Se deu algum erro exibe a mensagem abaixo
+      return console.error('Error:', response.statusText)
+    
+    const responseData = await response.json() // Pega a resposta e transforma em JSON
+
+    const newForm = mainForm.cloneNode(true) // Faz uma cópia do form
+    // Coloca os dados do novo usuario no form novo
+    newForm.name.value = responseData.name
+    newForm.email.value = responseData.email
+    newForm.dataset.id = responseData.id
+    newForm.id.readOnly = true
+    
+    mainForm.reset() // apaga o form principal
+    mainForm.before(newForm) // insere o novo form na página
+    return
+  }
+})
