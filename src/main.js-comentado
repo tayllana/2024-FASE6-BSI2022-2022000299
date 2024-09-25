@@ -86,7 +86,6 @@ document.addEventListener('submit', async (event) => { // Quando o formulario fo
     newForm.name.value = responseData.name
     newForm.email.value = responseData.email
     newForm.dataset.id = responseData.id
-    newForm.id.readOnly = true
     
     mainForm.reset() // apaga o form principal
     mainForm.before(newForm) // insere o novo form na página
